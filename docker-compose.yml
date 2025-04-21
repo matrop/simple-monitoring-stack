@@ -1,0 +1,67 @@
+services:
+  api:
+    container_name: api
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    networks:
+      - monitoring
+
+  loki:
+    container_name: loki
+    image: grafana/loki:3.4.3
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_storage:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - monitoring
+
+  alloy:
+    container_name: alloy
+    image: grafana/alloy:latest
+    ports:
+      - "12345:12345"
+    volumes:
+      - ./alloy_storage:/etc/alloy/something
+    command: 
+      run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/something/config.alloy
+    networks:
+      - monitoring
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v3.2.1
+    volumes:
+      - ./prometheus_storage/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "8081:9090"
+    networks:
+      - monitoring
+    
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:11.5.2
+    environment:
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_storage:/var/lib/grafana
+      - ./grafana_provisioning:/etc/grafana/provisioning  # Use a bind volume instead of a named one to map a custom directory
+    networks:
+      - monitoring
+    depends_on:
+      - prometheus
+  
+volumes:
+  grafana_storage:
+  prometheus_storage:
+  loki_storage:
+  alloy_storage:
+
+networks:
+  monitoring:
