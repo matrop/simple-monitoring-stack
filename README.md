@@ -11,3 +11,4 @@ How to run:
 
 ToDo:
 - [ ] Send Prometheus Logs using Alloy
+- [ ] Add another API to show scalability?
