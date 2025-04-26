@@ -13,3 +13,28 @@ loki.source.api "http_ingest" {
   }
   forward_to = [loki.write.local.receiver]
 }
+
+// Setup trace collection via tempo
+otelcol.receiver.otlp "default" {
+  grpc {}
+  http {}
+
+  output {
+    traces = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  output {
+    traces  = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls {
+      insecure = true     // Only suitable for non-production
+    }
+  }
+}

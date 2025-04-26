@@ -19,6 +19,19 @@ services:
     networks:
       - monitoring
 
+  tempo:
+    container_name: tempo
+    image: grafana/tempo:2.7.2
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo_provisioning/tempo.yaml:/etc/tempo.yaml
+      - tempo_storage:/var/tempo
+    ports:
+      - "3200:3200" # tempo
+      - "4317:4317" # otlp grpc
+    networks:
+      - monitoring
+
   alloy:
     container_name: alloy
     image: grafana/alloy:latest
@@ -62,6 +75,7 @@ volumes:
   prometheus_storage:
   loki_storage:
   alloy_storage:
+  tempo_storage:
 
 networks:
   monitoring:
