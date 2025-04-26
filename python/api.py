@@ -6,21 +6,6 @@ from classes import Item
 from alloy_logging_handler import AlloyHandler
 
 from prometheus_fastapi_instrumentator import Instrumentator
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
-from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry import trace
-
-# Set up OpenTelemetry tracing
-tracer_provider = TracerProvider()
-trace.set_tracer_provider(tracer_provider)
-
-# Configure exporter 
-otlp_exporter = OTLPSpanExporter(endpoint="http://tempo:4317")
-span_processor = BatchSpanProcessor(otlp_exporter)
-tracer_provider.add_span_processor(span_processor)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -28,7 +13,6 @@ logger.addHandler(AlloyHandler())
 
 app = FastAPI()
 Instrumentator().instrument(app).expose(app)
-# FastAPIInstrumentor.instrument(app)
 
 # In-memory storage for items
 items_db = []
