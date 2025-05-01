@@ -6,8 +6,6 @@ The Python API uses FastAPI and is very simple, as this was not the focus of thi
 
 ### Architecture
 
-ToDo: Architecture Diagram
-
 ![Architecture Overview](images/simple-monitoring-stack-architecture.png)
 
 As I had only little experience with creating APIs and even less with monitoring them, I tried to choose commonly accepted tools for this.
