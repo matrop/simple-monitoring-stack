@@ -1,4 +1,6 @@
 import logging
+import requests
+import json
 
 from fastapi import FastAPI, HTTPException
 from typing import List
@@ -57,3 +59,26 @@ def delete_item(item_id: int):
             deleted_item = items_db.pop(index)
             return deleted_item
     raise HTTPException(status_code=404, detail="Item not found")
+
+
+@app.get("/pokemon_name/", response_model=str)
+def get_pokemon_name(id: int):
+    URL = f"https://pokeapi.co/api/v2/pokemon/{id}"
+    response = requests.get(URL)
+    logger.info("/get_poke_name/ endpoint was called")
+
+    if not response.ok:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PokeAPI did not return a successful response. Details: {response.content}",
+        )
+
+    poke_name = json.loads(response.content).get("name")
+
+    if not poke_name:
+        raise HTTPException(
+            status_code=500,
+            detail=f"PokeAPI response does not include 'name' property. Details: {response.content}",
+        )
+
+    return poke_name
